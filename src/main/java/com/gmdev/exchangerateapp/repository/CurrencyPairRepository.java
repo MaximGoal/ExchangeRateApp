@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CurrencyPairRepository extends JpaRepository<CurrencyPair, Integer> {
+
+    public CurrencyPair findByBaseCharcodeAndQuotedCharcode(String base, String quoted);
 }

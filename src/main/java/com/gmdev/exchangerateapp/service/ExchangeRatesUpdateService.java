@@ -5,19 +5,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.LocalDate;
 
 @Component
 @RequiredArgsConstructor
 public class ExchangeRatesUpdateService {
 
-//    private static CBRParser cbrParser;
-
     public static void main(String[] args) {
-        Thread thread = new Thread(updateExchangeRates());
+        Thread thread = new Thread(updateExchangeRatesTask());
         thread.start();
     }
 
-    private static Runnable updateExchangeRates() {
+    private static Runnable updateExchangeRatesTask() {
 //        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         return () -> {
             while (true) {
@@ -26,7 +25,7 @@ public class ExchangeRatesUpdateService {
                     CBRParser.parsePage( CBRParser.getTodayPage() );
 
                     System.out.println("*** *** *** *** *** *** *** *** *** *** *** *** *** *** ***");
-                    String newDate = "21.11.2022";
+                    String newDate = LocalDate.now().minusDays(1).toString();
                     System.out.println("Date: " + newDate);
                     CBRParser.parsePage(CBRParser.getPage(newDate));
 

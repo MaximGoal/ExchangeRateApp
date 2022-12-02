@@ -1,6 +1,8 @@
 package com.gmdev.exchangerateapp.service;
 
 import com.gmdev.exchangerateapp.dto.CurrencyDataGetDto;
+import com.gmdev.exchangerateapp.model.CurrencyPair;
+import com.gmdev.exchangerateapp.model.ExchangeRate;
 import com.gmdev.exchangerateapp.repository.CurrencyPairRepository;
 import com.gmdev.exchangerateapp.repository.ExchangeRateRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,18 +17,19 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
 public class CBRParser {
 
-//    private final ExchangeRateRepository exchangeRateRepository;
-//    private final CurrencyPairRepository currencyPairRepository;
-
+    private final ExchangeRateRepository exchangeRateRepository;
+    private final CurrencyPairRepository currencyPairRepository;
 
     protected static Document getPage(String dateString) throws IOException {
         String url = "https://www.cbr.ru/currency_base/daily/?UniDbQuery.Posted=True&UniDbQuery.To="+dateString;
@@ -75,6 +78,23 @@ public class CBRParser {
         return base.getExchageRate() / quoted.getExchageRate();
     }
 
+    public void updateExchangeRates() {
+        List<CurrencyPair> pairsFromDB = currencyPairRepository.findAll();
+        for (CurrencyPair pair : pairsFromDB) {
+            int pairId = currencyPairRepository
+                    .findByBaseCharcodeAndQuotedCharcode(
+                            pair.getBaseCharcode(), pair.getQuotedCharcode()
+                    )
+                    .getId();
+            float newRate = getExchangeRate(pair.getBaseCharcode(), pair.getQuotedCharcode());
+            ExchangeRate rateToUpdate = exchangeRateRepository.findByCurrencyPairId(pairId);
+            exchangeRateRepository.updateRateValueAndDate(rateToUpdate.getId(), newRate, LocalDateTime.now());
+        }
+    }
 
+//    public ExchangeRate getOneRate(int pairId) {
+//        ExchangeRate oldRate = exchangeRateRepository.findByCurrencyPairId(pairId);
+//        return oldRate;
+//    }
 
 }
