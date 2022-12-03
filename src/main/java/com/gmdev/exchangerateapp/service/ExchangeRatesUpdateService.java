@@ -11,29 +11,34 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class ExchangeRatesUpdateService {
 
+    private static CBRParser cbrParser = CBRParser.get();
+
     public static void main(String[] args) {
-        Thread thread = new Thread(updateExchangeRatesTask());
+        ExchangeRatesUpdateService service = new ExchangeRatesUpdateService();
+        Thread thread = new Thread(service.updateExchangeRatesTask());
         thread.start();
     }
 
-    private static Runnable updateExchangeRatesTask() {
+    private Runnable updateExchangeRatesTask() {
 //        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         return () -> {
             while (true) {
                 try {
 
                     CBRParser.parsePage( CBRParser.getTodayPage() );
+                    cbrParser.updateExchangeRates();
 
                     System.out.println("*** *** *** *** *** *** *** *** *** *** *** *** *** *** ***");
-                    String newDate = LocalDate.now().minusDays(1).toString();
-                    System.out.println("Date: " + newDate);
-                    CBRParser.parsePage(CBRParser.getPage(newDate));
+
+//                    String newDate = LocalDate.now().minusDays(1).toString();
+//                    System.out.println("Date: " + newDate);
+//                    CBRParser.parsePage(CBRParser.getPage(newDate));
 
 //                    String command = reader.readLine();
 //                    if (command.equals("stop")) break;
                     Thread.sleep(1000 * 60 * 5);
 
-                } catch (IOException | InterruptedException e) {
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }

@@ -23,9 +23,10 @@ public class ExchangeRate {
     @Column(name = "rate_date")
     private LocalDateTime rateDate;
 
-    @Column(name = "rate_float")
+    @Column(name = "rate_value")
     private float rateValue;
 
-    @Column(name = "currency_pair_id")
-    private int currencyPairId;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "currency_pair_id", referencedColumnName = "id")
+    private CurrencyPair currencyPairId;
 }

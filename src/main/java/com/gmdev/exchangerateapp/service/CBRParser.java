@@ -10,6 +10,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -26,8 +27,9 @@ import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
-public class CBRParser {
+public class CBRParser implements InitializingBean {
 
+    private static CBRParser instance;
     private final ExchangeRateRepository exchangeRateRepository;
     private final CurrencyPairRepository currencyPairRepository;
 
@@ -70,12 +72,16 @@ public class CBRParser {
         } else return null;
     }
 
-    private float getExchangeRate(String stringCodeBase, String stringCodeQuoted) {
+    protected static float getExchangeRate(String stringCodeBase, String stringCodeQuoted) {
         List<CurrencyDataGetDto> currencies = parsePage(Objects.requireNonNull(getTodayPage()));
         CurrencyDataGetDto base = currencies.stream().filter(c -> c.getStringCode().equals(stringCodeBase)).findFirst().get();
         CurrencyDataGetDto quoted = currencies.stream().filter(c -> c.getStringCode().equals(stringCodeQuoted)).findFirst().get();
+        float result = base.getExchageRate() / quoted.getExchageRate();
 
-        return base.getExchageRate() / quoted.getExchageRate();
+        if (stringCodeBase.equals("RUR")) result = quoted.getExchageRate();
+        else if (stringCodeQuoted.equals("RUR")) result = 1 / quoted.getExchageRate();
+
+        return result;
     }
 
     public void updateExchangeRates() {
@@ -90,6 +96,15 @@ public class CBRParser {
             ExchangeRate rateToUpdate = exchangeRateRepository.findByCurrencyPairId(pairId);
             exchangeRateRepository.updateRateValueAndDate(rateToUpdate.getId(), newRate, LocalDateTime.now());
         }
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        instance = this;
+    }
+
+    public static CBRParser get() {
+        return instance;
     }
 
 //    public ExchangeRate getOneRate(int pairId) {
