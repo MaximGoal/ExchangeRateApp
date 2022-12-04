@@ -12,6 +12,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class CBRParser implements InitializingBean {
 
@@ -33,12 +34,12 @@ public class CBRParser implements InitializingBean {
     private final ExchangeRateRepository exchangeRateRepository;
     private final CurrencyPairRepository currencyPairRepository;
 
-    protected static Document getPage(String dateString) throws IOException {
+    protected Document getPage(String dateString) throws IOException {
         String url = "https://www.cbr.ru/currency_base/daily/?UniDbQuery.Posted=True&UniDbQuery.To="+dateString;
         return Jsoup.parse(new URL(url), 10000);
     }
 
-    static Document getTodayPage() {
+    protected Document getTodayPage() {
         String date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
         try {
             return getPage(date);
@@ -48,7 +49,7 @@ public class CBRParser implements InitializingBean {
         return null;
     }
 
-    protected static List<CurrencyDataGetDto> parsePage(Document page) {
+    protected List<CurrencyDataGetDto> parsePage(Document page) {
         Element table = page.selectFirst("table[class=data]");
         if (table != null) {
             Elements currencyData = table.select("tr");
@@ -72,7 +73,7 @@ public class CBRParser implements InitializingBean {
         } else return null;
     }
 
-    protected static float getExchangeRate(String stringCodeBase, String stringCodeQuoted) {
+    protected float getExchangeRate(String stringCodeBase, String stringCodeQuoted) {
         List<CurrencyDataGetDto> currencies = parsePage(Objects.requireNonNull(getTodayPage()));
         CurrencyDataGetDto base = currencies.stream().filter(c -> c.getStringCode().equals(stringCodeBase)).findFirst().get();
         CurrencyDataGetDto quoted = currencies.stream().filter(c -> c.getStringCode().equals(stringCodeQuoted)).findFirst().get();

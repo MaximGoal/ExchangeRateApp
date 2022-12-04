@@ -3,29 +3,30 @@ package com.gmdev.exchangerateapp.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDate;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class ExchangeRatesUpdateService {
 
     private static CBRParser cbrParser = CBRParser.get();
 
     public static void main(String[] args) {
-        ExchangeRatesUpdateService service = new ExchangeRatesUpdateService();
-        Thread thread = new Thread(service.updateExchangeRatesTask());
-        thread.start();
+//        ExchangeRatesUpdateService service = new ExchangeRatesUpdateService();
+//        Thread thread = new Thread(service.updateExchangeRatesTask());
+//        thread.start();
     }
 
-    private Runnable updateExchangeRatesTask() {
+    public Runnable updateExchangeRatesTask() {
 //        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         return () -> {
             while (true) {
                 try {
 
-                    CBRParser.parsePage( CBRParser.getTodayPage() );
+                    cbrParser.parsePage( cbrParser.getTodayPage() );
                     cbrParser.updateExchangeRates();
 
                     System.out.println("*** *** *** *** *** *** *** *** *** *** *** *** *** *** ***");

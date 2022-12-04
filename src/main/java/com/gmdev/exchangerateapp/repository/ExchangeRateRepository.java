@@ -13,10 +13,10 @@ import java.util.List;
 @Repository
 public interface ExchangeRateRepository extends JpaRepository<ExchangeRate, Long> {
 
-    public ExchangeRate findByCurrencyPairIdAndAndRateDate(int id, LocalDateTime dateTime);
+    ExchangeRate findByCurrencyPairIdAndAndRateDate(int id, LocalDateTime dateTime);
 
-    public ExchangeRate findByCurrencyPairId(int id);
+    ExchangeRate findByCurrencyPairId(int id);
 
-    @Query("UPDATE exchange_rate ex SET ex.rate_value = :value, ex.rate_date = :dateTime WHERE ex.id = :id")
-    public void updateRateValueAndDate(@Param("id") long id, @Param("value") float value, @Param("dateTime") LocalDateTime dateTime);
+    @Query("UPDATE ExchangeRate ex SET ex.rateValue = :value, ex.rateDate = :dateTime WHERE ex.id = :id")
+    void updateRateValueAndDate(@Param("id") long id, @Param("value") float value, @Param("dateTime") LocalDateTime dateTime);
 }
