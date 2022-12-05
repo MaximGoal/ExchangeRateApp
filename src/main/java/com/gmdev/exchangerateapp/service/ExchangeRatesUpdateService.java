@@ -1,7 +1,10 @@
 package com.gmdev.exchangerateapp.service;
 
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -13,11 +16,14 @@ import java.time.LocalDate;
 public class ExchangeRatesUpdateService {
 
     private static CBRParser cbrParser = CBRParser.get();
+    private static Logger logger = LoggerFactory.getLogger(ExchangeRatesUpdateService.class);
 
-    public static void main(String[] args) {
-//        ExchangeRatesUpdateService service = new ExchangeRatesUpdateService();
-//        Thread thread = new Thread(service.updateExchangeRatesTask());
-//        thread.start();
+    @Scheduled(fixedRate = 30000)
+    public void scheduleTaskWithFixedRate() {
+        logger.info("Start scheduleTaskWithFixedRate() in Thread: " + Thread.currentThread().getName());
+
+        cbrParser.parsePage( cbrParser.getTodayPage() );
+        cbrParser.updateExchangeRates();
     }
 
     public Runnable updateExchangeRatesTask() {

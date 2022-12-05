@@ -4,13 +4,11 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Table(name = "exchange_rate")
 @Getter
 @Setter
-@NoArgsConstructor
 @ToString
 @EqualsAndHashCode
 public class ExchangeRate {
@@ -26,7 +24,16 @@ public class ExchangeRate {
     @Column(name = "rate_value")
     private float rateValue;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "currency_pair_id", referencedColumnName = "id")
-    private CurrencyPair currencyPairId;
+    private CurrencyPair currencyPair;
+
+    public ExchangeRate() {
+    }
+
+    public ExchangeRate(LocalDateTime rateDate, float rateValue, CurrencyPair currencyPair) {
+        this.rateDate = rateDate;
+        this.rateValue = rateValue;
+        this.currencyPair = currencyPair;
+    }
 }

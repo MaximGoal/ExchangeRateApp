@@ -11,19 +11,17 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -75,27 +73,46 @@ public class CBRParser implements InitializingBean {
 
     protected float getExchangeRate(String stringCodeBase, String stringCodeQuoted) {
         List<CurrencyDataGetDto> currencies = parsePage(Objects.requireNonNull(getTodayPage()));
-        CurrencyDataGetDto base = currencies.stream().filter(c -> c.getStringCode().equals(stringCodeBase)).findFirst().get();
-        CurrencyDataGetDto quoted = currencies.stream().filter(c -> c.getStringCode().equals(stringCodeQuoted)).findFirst().get();
-        float result = base.getExchageRate() / quoted.getExchageRate();
+        CurrencyDataGetDto base = currencies.stream()
+                .filter(c -> c.getStringCode().equals(stringCodeBase))
+                .findFirst().orElse(null);
+        CurrencyDataGetDto quoted = currencies.stream()
+                .filter(c -> c.getStringCode().equals(stringCodeQuoted))
+                .findFirst().orElse(null);
 
-        if (stringCodeBase.equals("RUR")) result = quoted.getExchageRate();
-        else if (stringCodeQuoted.equals("RUR")) result = 1 / quoted.getExchageRate();
+        float result = 0.0F;
+
+        if (base != null && quoted != null)
+            result = base.getExchageRate() / quoted.getExchageRate();
+        else if (quoted != null && stringCodeBase.equals("RUR"))
+            result = quoted.getExchageRate();
+        else if (base != null && stringCodeQuoted.equals("RUR"))
+            result = 1 / base.getExchageRate();
 
         return result;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public void updateExchangeRates() {
+
         List<CurrencyPair> pairsFromDB = currencyPairRepository.findAll();
+
         for (CurrencyPair pair : pairsFromDB) {
-            int pairId = currencyPairRepository
-                    .findByBaseCharcodeAndQuotedCharcode(
-                            pair.getBaseCharcode(), pair.getQuotedCharcode()
-                    )
-                    .getId();
+
             float newRate = getExchangeRate(pair.getBaseCharcode(), pair.getQuotedCharcode());
-            ExchangeRate rateToUpdate = exchangeRateRepository.findByCurrencyPairId(pairId);
-            exchangeRateRepository.updateRateValueAndDate(rateToUpdate.getId(), newRate, LocalDateTime.now());
+
+            ExchangeRate rateToUpdate = exchangeRateRepository.findByCurrencyPair(pair).orElse(null);
+
+            if (rateToUpdate != null) {
+                exchangeRateRepository.updateRateValueAndDate(rateToUpdate.getId(), newRate, LocalDateTime.now());
+            } else if (rateToUpdate == null || pair.getBaseCharcode().equals("RUR") || pair.getQuotedCharcode().equals("RUR")){
+                ExchangeRate newExchangeRate = new ExchangeRate();
+                newExchangeRate.setRateDate(LocalDateTime.now());
+                newExchangeRate.setRateValue(newRate);
+                newExchangeRate.setCurrencyPair(pair);
+
+                exchangeRateRepository.save(newExchangeRate);
+            }
         }
     }
 
