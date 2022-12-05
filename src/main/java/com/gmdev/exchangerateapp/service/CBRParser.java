@@ -12,6 +12,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -92,7 +93,7 @@ public class CBRParser implements InitializingBean {
         return result;
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE)
     public void updateExchangeRates() {
 
         List<CurrencyPair> pairsFromDB = currencyPairRepository.findAll();
