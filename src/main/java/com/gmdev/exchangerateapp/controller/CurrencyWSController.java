@@ -8,6 +8,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @RestController
 @RequestMapping("/сurrencyws")
@@ -19,7 +21,9 @@ public class CurrencyWSController {
     @GetMapping(value = "/getExchangeRate/{currencyPairId}/{date}",
             produces = "application/json")
     public ResponseEntity<Float> getExchangeRate (@PathVariable Integer currencyPairId, @PathVariable LocalDate date) {
-        Float response = service.getRateByCurrencyPairIdAndDate(currencyPairId, date);
+        Float response = service.getRateByCurrencyPairIdAndDate(
+                currencyPairId,
+                LocalDateTime.of(date, LocalTime.of(0,0,0)));
 
         return ResponseEntity.ok(response);
     }

@@ -23,7 +23,8 @@ public interface ExchangeRateRepository extends JpaRepository<ExchangeRate, Long
     Optional<ExchangeRate> findByCurrencyPairId(Integer pairId);
     Optional<ExchangeRate> findFirstByCurrencyPairId(Integer pairId);
 
-    Optional<ExchangeRate> findByCurrencyPairAndAndRateDate (Integer currencyPairId, LocalDate date);
+    Optional<ExchangeRate> findByCurrencyPairAndAndRateDate (CurrencyPair currencyPair, LocalDateTime dateTime);
+    Optional<ExchangeRate> findFirstByCurrencyPairAndRateDateAfter (CurrencyPair currencyPair, LocalDateTime dateTime);
 
     Optional<ExchangeRate> findFirstByCurrencyPairOrderByRateDateDesc(Integer currencyPairId);
 

@@ -20,11 +20,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -104,14 +102,16 @@ public class CBRParser implements InitializingBean {
 
             float newRate = getExchangeRate(pair.getBaseCharcode(), pair.getQuotedCharcode());
 
-//            ExchangeRate rateToUpdate = exchangeRateRepository.findByCurrencyPair(pair).orElse(null);
-            ExchangeRate rateToUpdate = exchangeRateRepository.findFirstByCurrencyPairId(pair.getId()).orElse(null);
-            LocalDate today = LocalDate.now();
-            if (rateToUpdate != null && rateToUpdate.getRateDate().toLocalDate().equals(today)) {
-                exchangeRateRepository.updateRateValueAndDate(rateToUpdate.getId(), newRate, LocalDateTime.now());
-            } else if (rateToUpdate == null ||
-                    !rateToUpdate.getRateDate().toLocalDate().equals(today) ||
-                    pair.getBaseCharcode().equals("RUR") || pair.getQuotedCharcode().equals("RUR")) {
+            LocalDateTime today = LocalDateTime.of(LocalDate.now(), LocalTime.of(0,0,0));
+            Optional<ExchangeRate> rateToUpdate = exchangeRateRepository
+                    .findFirstByCurrencyPairAndRateDateAfter(pair,today);
+            rateToUpdate.ifPresent(exchangeRate -> exchangeRateRepository.updateRateValueAndDate(exchangeRate.getId(), newRate, LocalDateTime.now()));
+//            ExchangeRate rateToUpdate = exchangeRateRepository.findFirstByCurrencyPairId(pair.getId()).orElse(null);
+
+            if (rateToUpdate.isEmpty()
+//                    || !rateToUpdate.getRateDate().toLocalDate().equals(today)
+//                    || pair.getBaseCharcode().equals("RUR") || pair.getQuotedCharcode().equals("RUR")
+            ) {
                 ExchangeRate newExchangeRate = new ExchangeRate();
                 newExchangeRate.setRateDate(LocalDateTime.now());
                 newExchangeRate.setRateValue(newRate);
@@ -119,6 +119,21 @@ public class CBRParser implements InitializingBean {
 
                 exchangeRateRepository.save(newExchangeRate);
             }
+//            Optional<ExchangeRate> rateTodayToUpdate = exchangeRateRepository.findByCurrencyPairAndAndRateDate(pair, today);
+//            rateTodayToUpdate.ifPresent(exchangeRate -> exchangeRateRepository.updateRateValueAndDate(exchangeRate.getId(), newRate, LocalDateTime.now()));
+
+//            if (rateToUpdate != null && rateToUpdate.getRateDate().toLocalDate().equals(today)) {
+//                exchangeRateRepository.updateRateValueAndDate(rateToUpdate.getId(), newRate, LocalDateTime.now());
+//            } else if (rateToUpdate == null ||
+//                    !rateToUpdate.getRateDate().toLocalDate().equals(today) ||
+//                    pair.getBaseCharcode().equals("RUR") || pair.getQuotedCharcode().equals("RUR")) {
+//                ExchangeRate newExchangeRate = new ExchangeRate();
+//                newExchangeRate.setRateDate(LocalDateTime.now());
+//                newExchangeRate.setRateValue(newRate);
+//                newExchangeRate.setCurrencyPair(pair);
+//
+//                exchangeRateRepository.save(newExchangeRate);
+//            }
         }
     }
 

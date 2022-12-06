@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
@@ -21,10 +22,12 @@ public class ExchangeRatesService {
     private final CurrencyPairRepository currencyPairRepository;
 
     @Transactional(readOnly = true)
-    public Float getRateByCurrencyPairIdAndDate( int currencyPairId, LocalDate date) {
-       date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+    public Float getRateByCurrencyPairIdAndDate( int currencyPairId, LocalDateTime date) {
+        date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        CurrencyPair currencyPair = currencyPairRepository.findById(currencyPairId).orElse(null);
 
-        Optional<ExchangeRate> optionalRate = exchangeRateRepository.findByCurrencyPairAndAndRateDate(currencyPairId, date);
+        Optional<ExchangeRate> optionalRate = exchangeRateRepository
+                .findByCurrencyPairAndAndRateDate(currencyPair, date);
         if (optionalRate.isPresent()) {
             return optionalRate.get().getRateValue();
         } else return null;
