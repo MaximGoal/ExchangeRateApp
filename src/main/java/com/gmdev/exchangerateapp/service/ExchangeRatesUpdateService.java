@@ -14,6 +14,7 @@ import java.time.LocalDate;
 @Service
 @RequiredArgsConstructor
 public class ExchangeRatesUpdateService {
+    //TODO: CBRParser should add all new rates into db with new timestamp
 
     private static CBRParser cbrParser = CBRParser.get();
     private static Logger logger = LoggerFactory.getLogger(ExchangeRatesUpdateService.class);

@@ -24,6 +24,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -96,17 +97,21 @@ public class CBRParser implements InitializingBean {
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE)
     public void updateExchangeRates() {
 
-        List<CurrencyPair> pairsFromDB = currencyPairRepository.findAll();
+//        List<CurrencyPair> pairsFromDB = currencyPairRepository.findAll();
+        List<CurrencyPair> pairsFromDB = currencyPairRepository.findAllUnique();
 
         for (CurrencyPair pair : pairsFromDB) {
 
             float newRate = getExchangeRate(pair.getBaseCharcode(), pair.getQuotedCharcode());
 
-            ExchangeRate rateToUpdate = exchangeRateRepository.findByCurrencyPair(pair).orElse(null);
-
-            if (rateToUpdate != null) {
+//            ExchangeRate rateToUpdate = exchangeRateRepository.findByCurrencyPair(pair).orElse(null);
+            ExchangeRate rateToUpdate = exchangeRateRepository.findFirstByCurrencyPairId(pair.getId()).orElse(null);
+            LocalDate today = LocalDate.now();
+            if (rateToUpdate != null && rateToUpdate.getRateDate().toLocalDate().equals(today)) {
                 exchangeRateRepository.updateRateValueAndDate(rateToUpdate.getId(), newRate, LocalDateTime.now());
-            } else if (rateToUpdate == null || pair.getBaseCharcode().equals("RUR") || pair.getQuotedCharcode().equals("RUR")){
+            } else if (rateToUpdate == null ||
+                    !rateToUpdate.getRateDate().toLocalDate().equals(today) ||
+                    pair.getBaseCharcode().equals("RUR") || pair.getQuotedCharcode().equals("RUR")) {
                 ExchangeRate newExchangeRate = new ExchangeRate();
                 newExchangeRate.setRateDate(LocalDateTime.now());
                 newExchangeRate.setRateValue(newRate);
