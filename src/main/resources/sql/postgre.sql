@@ -13,8 +13,9 @@ CREATE TABLE exchange_rate (
 	currency_pair_id int references currency_pair(id)
 );
 
+ALTER table currency_pair add constraint two_pairs_constraint UNIQUE (base_charcode, quoted_charcode);
+
 --CREATE index exchange_rate_id_idx on exchange_rate (id);
-delete index
 CREATE index currency_pair_idx on currency_pair (base_charcode, quoted_charcode);
 
 insert into currency_pair(base_charcode, quoted_charcode) values
@@ -24,3 +25,4 @@ insert into currency_pair(base_charcode, quoted_charcode) values
 	('EUR', 'USD'),
 	('RUR', 'USD'),
 	('USD', 'RUR');
+

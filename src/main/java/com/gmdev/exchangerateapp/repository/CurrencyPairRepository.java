@@ -6,12 +6,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 
 @Repository
 public interface CurrencyPairRepository extends JpaRepository<CurrencyPair, Integer> {
 
-    CurrencyPair findByBaseCharcodeAndQuotedCharcode(String base, String quoted);
+    Optional<CurrencyPair> findFirstByBaseCharcodeAndQuotedCharcode(String base, String quoted);
 
     @Query("select distinct cp from CurrencyPair cp ")
     List<CurrencyPair> findAllUnique();

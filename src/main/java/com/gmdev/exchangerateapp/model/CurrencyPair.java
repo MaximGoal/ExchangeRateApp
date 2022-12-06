@@ -11,6 +11,8 @@ import lombok.*;
 @NoArgsConstructor
 @ToString
 @EqualsAndHashCode
+@AllArgsConstructor
+@Builder
 public class CurrencyPair {
 
     @Id

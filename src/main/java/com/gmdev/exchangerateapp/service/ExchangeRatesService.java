@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalTime;
 import java.util.Optional;
 
 @Service
@@ -22,19 +22,22 @@ public class ExchangeRatesService {
     private final CurrencyPairRepository currencyPairRepository;
 
     @Transactional(readOnly = true)
-    public Float getRateByCurrencyPairIdAndDate( int currencyPairId, LocalDateTime date) {
-        date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+    public Float getRateByCurrencyPairIdAndDate( int currencyPairId, LocalDate date) {
         CurrencyPair currencyPair = currencyPairRepository.findById(currencyPairId).orElse(null);
 
+        LocalDateTime dateTimeFrom = LocalDateTime.of(date, LocalTime.of(0,0,0));
+        LocalDateTime dateTimeTo = LocalDateTime.of(date, LocalTime.of(23,59,59));
+
         Optional<ExchangeRate> optionalRate = exchangeRateRepository
-                .findByCurrencyPairAndAndRateDate(currencyPair, date);
+                .findByCurrencyPairAndAndRateDateBetween(currencyPair, dateTimeFrom, dateTimeTo);
+
         if (optionalRate.isPresent()) {
             return optionalRate.get().getRateValue();
         } else return null;
     }
 
     @Transactional(readOnly = true)
-    public Float getRateByCurrencyPairId( int currencyPairId ) {
+    public Float getRateByCurrencyPairId ( int currencyPairId ) {
 //        CurrencyPair currencyPair = currencyPairRepository
 //                .findById(currencyPairId)
 //                .orElseThrow(() -> new IllegalArgumentException("No such currency_pair id"));
