@@ -19,7 +19,7 @@ public class ExchangeRatesUpdateService {
     private static CBRParser cbrParser = CBRParser.get();
     private static Logger logger = LoggerFactory.getLogger(ExchangeRatesUpdateService.class);
 
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 60000)
     public void scheduleTaskWithFixedRate() {
         logger.info("Start scheduleTaskWithFixedRate() in Thread: " + Thread.currentThread().getName());
 

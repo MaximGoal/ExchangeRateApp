@@ -63,4 +63,9 @@ public class CurrencyWSController {
             return ResponseEntity.ok(HttpStatus.CREATED);
         }
     }
+
+    @ExceptionHandler({NullPointerException.class, IllegalArgumentException.class})
+    public ResponseEntity<HttpStatus> handleNullPointerException() {
+        return ResponseEntity.ok(HttpStatus.NOT_FOUND);
+    }
 }
