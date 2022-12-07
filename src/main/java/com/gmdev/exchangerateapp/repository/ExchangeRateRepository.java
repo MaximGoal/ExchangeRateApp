@@ -16,13 +16,6 @@ import java.util.Optional;
 @Repository
 public interface ExchangeRateRepository extends JpaRepository<ExchangeRate, Long> {
 
-//    ExchangeRate findByCurrencyPairIdAndAndRateDate(int id, LocalDateTime dateTime);
-
-    Optional<ExchangeRate> findByCurrencyPair(CurrencyPair pair);
-
-    Optional<ExchangeRate> findByCurrencyPairId(Integer pairId);
-    Optional<ExchangeRate> findFirstByCurrencyPairId(Integer pairId);
-
     Optional<ExchangeRate> findByCurrencyPairAndAndRateDate (CurrencyPair currencyPair, LocalDateTime dateTime);
     Optional<ExchangeRate> findByCurrencyPairAndAndRateDateBetween (CurrencyPair currencyPair, LocalDateTime dateTimeFrom, LocalDateTime dateTimeTo);
     Optional<ExchangeRate> findFirstByCurrencyPairAndRateDateAfter (CurrencyPair currencyPair, LocalDateTime dateTime);

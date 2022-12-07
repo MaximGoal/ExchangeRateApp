@@ -132,5 +132,4 @@ public class CBRParser implements InitializingBean {
     public static CBRParser get() {
         return instance;
     }
-
 }

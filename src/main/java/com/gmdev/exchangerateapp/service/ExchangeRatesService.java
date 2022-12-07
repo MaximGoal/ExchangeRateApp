@@ -17,7 +17,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ExchangeRatesService {
 
-    private final CBRParser cbrParser;
     private final ExchangeRateRepository exchangeRateRepository;
     private final CurrencyPairRepository currencyPairRepository;
 

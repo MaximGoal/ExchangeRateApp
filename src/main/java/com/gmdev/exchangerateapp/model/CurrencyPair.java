@@ -8,9 +8,9 @@ import lombok.*;
 @Table(name = "currency_pair")
 @Getter
 @Setter
-@NoArgsConstructor
 @ToString
 @EqualsAndHashCode
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class CurrencyPair {

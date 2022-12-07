@@ -10,17 +10,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ApplicationConfiguration {
 
-//    private ExchangeRateRepository exchangeRateRepository;
-//    private CurrencyPairRepository currencyPairRepository;
-
 //    @Bean
 //    public CBRParser cbrParser () {
-////        return new CBRParser(exchangeRateRepository, currencyPairRepository);
 //        return CBRParser.get();
 //    }
 
-//    @Bean
-//    public ExchangeRatesUpdateService exchangeRatesUpdateService () {
-//        return new ExchangeRatesUpdateService();
-//    }
 }
