@@ -27,7 +27,7 @@ public interface ExchangeRateRepository extends JpaRepository<ExchangeRate, Long
     Optional<ExchangeRate> findByCurrencyPairAndAndRateDateBetween (CurrencyPair currencyPair, LocalDateTime dateTimeFrom, LocalDateTime dateTimeTo);
     Optional<ExchangeRate> findFirstByCurrencyPairAndRateDateAfter (CurrencyPair currencyPair, LocalDateTime dateTime);
 
-    Optional<ExchangeRate> findFirstByCurrencyPairOrderByRateDateDesc(Integer currencyPairId);
+    Optional<ExchangeRate> findFirstByCurrencyPairOrderByRateDateDesc(CurrencyPair currencyPair);
 
     @Query("UPDATE ExchangeRate ex SET ex.rateValue = :value, ex.rateDate = :dateTime WHERE ex.id = :id")
     @Modifying

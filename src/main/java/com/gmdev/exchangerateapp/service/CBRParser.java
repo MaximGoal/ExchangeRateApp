@@ -29,6 +29,7 @@ import java.util.*;
 public class CBRParser implements InitializingBean {
 
     private static CBRParser instance;
+    private List<CurrencyDataGetDto> currencyDataGetDtosListOfBean;
     private final ExchangeRateRepository exchangeRateRepository;
     private final CurrencyPairRepository currencyPairRepository;
 
@@ -66,13 +67,15 @@ public class CBRParser implements InitializingBean {
                 currencies.add(currency);
             }
 
-            currencies.forEach(System.out::println);
+//            currencies.forEach(System.out::println);
+            currencyDataGetDtosListOfBean = new ArrayList<>(currencies);
             return currencies;
         } else return null;
     }
 
     protected float getExchangeRate(String stringCodeBase, String stringCodeQuoted) {
-        List<CurrencyDataGetDto> currencies = parsePage(Objects.requireNonNull(getTodayPage()));
+//        List<CurrencyDataGetDto> currencies = parsePage(Objects.requireNonNull(getTodayPage()));
+        List<CurrencyDataGetDto> currencies = currencyDataGetDtosListOfBean;
         CurrencyDataGetDto base = currencies.stream()
                 .filter(c -> c.getStringCode().equals(stringCodeBase))
                 .findFirst().orElse(null);
@@ -95,7 +98,6 @@ public class CBRParser implements InitializingBean {
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE)
     public void updateExchangeRates() {
 
-//        List<CurrencyPair> pairsFromDB = currencyPairRepository.findAll();
         List<CurrencyPair> pairsFromDB = currencyPairRepository.findAllUnique();
 
         for (CurrencyPair pair : pairsFromDB) {
@@ -119,21 +121,6 @@ public class CBRParser implements InitializingBean {
 
                 exchangeRateRepository.save(newExchangeRate);
             }
-//            Optional<ExchangeRate> rateTodayToUpdate = exchangeRateRepository.findByCurrencyPairAndAndRateDate(pair, today);
-//            rateTodayToUpdate.ifPresent(exchangeRate -> exchangeRateRepository.updateRateValueAndDate(exchangeRate.getId(), newRate, LocalDateTime.now()));
-
-//            if (rateToUpdate != null && rateToUpdate.getRateDate().toLocalDate().equals(today)) {
-//                exchangeRateRepository.updateRateValueAndDate(rateToUpdate.getId(), newRate, LocalDateTime.now());
-//            } else if (rateToUpdate == null ||
-//                    !rateToUpdate.getRateDate().toLocalDate().equals(today) ||
-//                    pair.getBaseCharcode().equals("RUR") || pair.getQuotedCharcode().equals("RUR")) {
-//                ExchangeRate newExchangeRate = new ExchangeRate();
-//                newExchangeRate.setRateDate(LocalDateTime.now());
-//                newExchangeRate.setRateValue(newRate);
-//                newExchangeRate.setCurrencyPair(pair);
-//
-//                exchangeRateRepository.save(newExchangeRate);
-//            }
         }
     }
 
@@ -145,10 +132,5 @@ public class CBRParser implements InitializingBean {
     public static CBRParser get() {
         return instance;
     }
-
-//    public ExchangeRate getOneRate(int pairId) {
-//        ExchangeRate oldRate = exchangeRateRepository.findByCurrencyPairId(pairId);
-//        return oldRate;
-//    }
 
 }

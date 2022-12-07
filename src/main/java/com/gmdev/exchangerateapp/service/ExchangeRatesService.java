@@ -38,12 +38,12 @@ public class ExchangeRatesService {
 
     @Transactional(readOnly = true)
     public Float getRateByCurrencyPairId ( int currencyPairId ) {
-//        CurrencyPair currencyPair = currencyPairRepository
-//                .findById(currencyPairId)
-//                .orElseThrow(() -> new IllegalArgumentException("No such currency_pair id"));
+        CurrencyPair currencyPair = currencyPairRepository
+                .findById(currencyPairId)
+                .orElseThrow(() -> new IllegalArgumentException("No such currency_pair id"));
 //
         Optional<ExchangeRate> optionalRate = exchangeRateRepository
-                .findFirstByCurrencyPairOrderByRateDateDesc(currencyPairId);
+                .findFirstByCurrencyPairOrderByRateDateDesc(currencyPair);
         if (optionalRate.isPresent()) {
             return optionalRate.get().getRateValue();
         } else return null;

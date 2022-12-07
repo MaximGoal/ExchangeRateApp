@@ -28,7 +28,6 @@ public class ExchangeRatesUpdateService {
     }
 
     public Runnable updateExchangeRatesTask() {
-//        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         return () -> {
             while (true) {
                 try {
@@ -38,12 +37,6 @@ public class ExchangeRatesUpdateService {
 
                     System.out.println("*** *** *** *** *** *** *** *** *** *** *** *** *** *** ***");
 
-//                    String newDate = LocalDate.now().minusDays(1).toString();
-//                    System.out.println("Date: " + newDate);
-//                    CBRParser.parsePage(CBRParser.getPage(newDate));
-
-//                    String command = reader.readLine();
-//                    if (command.equals("stop")) break;
                     Thread.sleep(1000 * 60 * 5);
 
                 } catch (InterruptedException e) {
